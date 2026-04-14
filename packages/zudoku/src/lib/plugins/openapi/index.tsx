@@ -3,6 +3,7 @@ import { type PropsWithChildren, Suspense, lazy } from "react";
 import { matchPath } from "react-router";
 import type { ZudokuPlugin } from "../../core/plugins.js";
 import { Button } from "../../ui/Button.js";
+import { t } from "../../util/i18n.js";
 import { joinUrl } from "../../util/joinUrl.js";
 import { GraphQLClient } from "./client/GraphQLClient.js";
 import { createQuery } from "./client/useCreateQuery.js";
@@ -112,6 +113,8 @@ export const openApiPlugin = (config: OasPluginConfig): ZudokuPlugin => {
       },
     }),
     getNavigation: async (path, context) => {
+      const lang = context.options.site?.lang;
+
       if (!matchPath({ path: basePath, end: false }, path)) {
         return [];
       }
@@ -181,7 +184,7 @@ export const openApiPlugin = (config: OasPluginConfig): ZudokuPlugin => {
           categories.unshift({
             type: "link" as const,
             to: joinUrl(basePath, versionParam),
-            label: "Information",
+            label: t(lang, "navigation.information", "Information"),
           });
         }
 
@@ -192,7 +195,11 @@ export const openApiPlugin = (config: OasPluginConfig): ZudokuPlugin => {
         if (untaggedOperations && untaggedOperations.length > 0) {
           categories.push(
             createNavigationCategory({
-              label: categories.length === 0 ? "Endpoints" : "Other endpoints",
+              label:
+                categories.length === 0
+                  ? t(lang, "navigation.endpoints", "Endpoints")
+                  : t(lang, "navigation.otherEndpoints", "Other endpoints"),
+
               path: joinUrl(basePath, versionParam, UNTAGGED_PATH),
               operations: untaggedOperations,
               collapsed: !config.options?.expandAllTags,
@@ -203,7 +210,7 @@ export const openApiPlugin = (config: OasPluginConfig): ZudokuPlugin => {
         if (data.schema.components?.schemas?.length) {
           categories.push({
             type: "link",
-            label: "Schemas",
+            label: t(lang, "navigation.schemas", "Schemas"),
             to: joinUrl(basePath, versionParam, "~schemas"),
           });
         }

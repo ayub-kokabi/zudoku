@@ -13,6 +13,7 @@ import { Kbd, KbdGroup } from "zudoku/ui/Kbd.js";
 import { useAuthState } from "../../authentication/state.js";
 import { useZudoku } from "../../components/context/ZudokuContext.js";
 import { SEARCH_PROTECTED_SECTION } from "../../core/RouteGuard.js";
+import { t } from "../../util/i18n.js";
 import { joinUrl } from "../../util/joinUrl.js";
 import { getResults } from "./get-results.js";
 import type { PagefindOptions } from "./index.js";
@@ -114,6 +115,9 @@ export const PagefindSearch = ({
     setSelectedValue(firstValue);
   }, [searchResults]);
 
+  const { options: zudokuOptions } = useZudoku();
+  const lang = zudokuOptions.site?.lang;
+
   return (
     <CommandDialog
       command={{
@@ -131,7 +135,7 @@ export const PagefindSearch = ({
       </VisuallyHidden>
       <CommandInput
         ref={inputRef}
-        placeholder="Search..."
+        placeholder={t(lang, "search.placeholder", "Search...")}
         value={searchTerm}
         onValueChange={setSearchTerm}
         disabled={isError}
@@ -151,7 +155,7 @@ export const PagefindSearch = ({
             </Button>
           </div>
         ) : (
-          "Start typing to search"
+          t(lang, "search.empty", "Start typing to search")
         )}
       </CommandEmpty>
       {isError && error.message !== "NOT_BUILT_YET" ? (
@@ -173,15 +177,15 @@ export const PagefindSearch = ({
                 <Kbd>↑</Kbd>
                 <Kbd>↓</Kbd>
               </KbdGroup>
-              Navigate
+              {t(lang, "search.navigate", "Navigate")}
               <KbdGroup className="ms-4 me-1">
                 <Kbd>↵</Kbd>
               </KbdGroup>
-              Select
+              {t(lang, "search.select", "Select")}
               <KbdGroup className="ms-4 me-1">
                 <Kbd>Esc</Kbd>
               </KbdGroup>
-              Close dialog
+              {t(lang, "search.close", "Close dialog")}
             </div>
             {import.meta.env.DEV && (
               <IndexingDialog>
@@ -190,7 +194,7 @@ export const PagefindSearch = ({
                   className="h-7 text-xs text-muted-foreground"
                 >
                   <ListPlusIcon />
-                  Build Search Index
+                  {t(lang, "search.indexing", "Build Search Index")}
                 </Button>
               </IndexingDialog>
             )}

@@ -1,12 +1,14 @@
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { MinusIcon, PlusIcon, RefreshCcwDotIcon } from "lucide-react";
 import { useState } from "react";
+import { useZudoku } from "zudoku/components";
 import { Item, ItemActions, ItemContent, ItemTitle } from "zudoku/ui/Item.js";
 import { InlineCode } from "../../../components/InlineCode.js";
 import { Markdown } from "../../../components/Markdown.js";
 import type { SchemaObject } from "../../../oas/parser/index.js";
 import { Button } from "../../../ui/Button.js";
 import { cn } from "../../../util/cn.js";
+import { getDirection } from "../../../util/i18n.js";
 import { ConstValue } from "../components/ConstValue.js";
 import { EnumValues } from "../components/EnumValues.js";
 import { ParamInfos } from "../ParamInfos.js";
@@ -43,6 +45,10 @@ export const SchemaPropertyItem = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const isDeprecated = group === "deprecated";
+
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
 
   if (isCircularRef(schema)) {
     return (
@@ -133,9 +139,12 @@ export const SchemaPropertyItem = ({
           />
         </div>
         {shouldRenderDescription && (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5" dir={dir}>
             {schema.description && (
-              <Markdown className="prose-sm" content={schema.description} />
+              <Markdown
+                className="prose-sm max-w-none"
+                content={schema.description}
+              />
             )}
             {"items" in schema && schema.items?.enum && (
               <EnumValues values={schema.items.enum} />

@@ -44,6 +44,7 @@ const AutocompletePopover = ({
       <PopoverAnchor>
         <CommandInlineInput
           autoComplete="off"
+          dir="ltr"
           ref={(el) => {
             inputRef.current = el;
             if (typeof ref === "function") {
@@ -80,6 +81,7 @@ const AutocompletePopover = ({
         onMouseEnter={() => setDontClose(true)}
         onMouseLeave={() => setDontClose(false)}
         onOpenAutoFocus={(e) => e.preventDefault()}
+        dir="ltr"
         className={cn("p-0 w-(--radix-popover-trigger-width)", {
           "border-0": count === 0,
         })}
@@ -93,10 +95,11 @@ const AutocompletePopover = ({
           e.stopPropagation();
         }}
       >
-        <CommandList className="max-h-[140px]">
+        <CommandList className="max-h-35">
           {options.map((enumValue) => (
             <CommandItem
               key={enumValue}
+              dir="ltr"
               value={enumValue}
               onSelect={(selected) => {
                 onSelect?.(selected);

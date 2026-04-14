@@ -14,6 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "zudoku/ui/Dialog.js";
+import { useZudoku } from "../../components/context/ZudokuContext.js";
+import { t } from "../../util/i18n.js";
 
 type IndexingState =
   | { status: "idle" }
@@ -47,6 +49,8 @@ const ProgressBar = ({
 };
 
 const IndexingDialog = ({ children }: PropsWithChildren) => {
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
   const [indexingState, setIndexingState] = useState<IndexingState>({
     status: "idle",
   });
@@ -108,48 +112,65 @@ const IndexingDialog = ({ children }: PropsWithChildren) => {
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>
-            {indexingState.status === "indexing" && "Building Search Index"}
-            {indexingState.status === "complete" && "Indexing Complete"}
-            {indexingState.status === "error" && "Indexing Failed"}
-            {indexingState.status === "idle" && "Build Search Index"}
+          <DialogTitle className="me-auto pb-4">
+            {indexingState.status === "indexing" &&
+              t(lang, "search.indexing.building", "Building Search Index")}
+            {indexingState.status === "complete" &&
+              t(lang, "search.indexing.complete", "Indexing Complete")}
+            {indexingState.status === "error" &&
+              t(lang, "search.indexing.failed", "Indexing Failed")}
+            {indexingState.status === "idle" &&
+              t(lang, "search.indexing.title", "Build Search Index")}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="mx-auto">
             {indexingState.status === "indexing" && (
               <>
                 {indexingState.total > 0 && (
-                  <span className="font-mono text-sm mb-2 block">
+                  <span className="font-mono text-sm mb-2 block" dir="ltr">
                     <ProgressBar {...indexingState} />
                   </span>
                 )}
                 {indexingState.path && (
-                  <span className="block text-xs truncate">
+                  <span className="block text-xs truncate font-mono" dir="ltr">
                     {indexingState.path}
                   </span>
                 )}
               </>
             )}
-            {indexingState.status === "complete" && (
-              <>Successfully indexed {indexingState.indexed} pages.</>
-            )}
+            {indexingState.status === "complete" &&
+              t(
+                lang,
+                "search.indexing.success",
+                `Successfully indexed ${indexingState.indexed} pages.`,
+              ).replace("{count}", String(indexingState.indexed))}
             {indexingState.status === "error" && (
-              <span className="text-destructive">{indexingState.message}</span>
+              <span className="text-destructive">
+                {indexingState.message === "Connection lost during indexing"
+                  ? t(
+                      lang,
+                      "search.indexing.error.connection",
+                      "Connection lost during indexing",
+                    )
+                  : indexingState.message}
+              </span>
             )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 mx-auto">
             {indexingState.status === "complete" && (
               <Button size="sm" onClick={handleDone}>
-                Close and reload
+                {t(lang, "search.indexing.closeReload", "Close and reload")}
               </Button>
             )}
             {indexingState.status === "error" && (
               <>
                 <Button variant="outline" onClick={handleDone}>
-                  Cancel
+                  {t(lang, "playground.cancel", "Cancel")}
                 </Button>
-                <Button onClick={startIndexing}>Retry</Button>
+                <Button onClick={startIndexing}>
+                  {t(lang, "search.indexing.retry", "Retry")}
+                </Button>
               </>
             )}
           </div>

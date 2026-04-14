@@ -1,7 +1,18 @@
 import type { ZudokuConfig } from "zudoku";
 
 const config: ZudokuConfig = {
+  search: {
+    type: "pagefind",
+  },
+  theme: {
+    fonts: {
+      sans: "Vazirmatn",
+      serif: "Vazirmatn",
+      mono: "Vazircode",
+    },
+  },
   site: {
+    lang: "fa",
     logo: {
       src: { light: "/logo-light.svg", dark: "/logo-dark.svg" },
       alt: "Zudoku",
@@ -11,12 +22,12 @@ const config: ZudokuConfig = {
   navigation: [
     {
       type: "category",
-      label: "Documentation",
+      label: "معرفی",
       link: "documentation/installation",
       items: [
         {
           type: "category",
-          label: "Get started",
+          label: "شروع کنید",
           items: ["documentation/introduction", "documentation/installation"],
         },
       ],
@@ -24,19 +35,14 @@ const config: ZudokuConfig = {
     {
       type: "link",
       to: "/api/rick-and-morty",
-      label: "Rick & Morty API",
-    },
-    {
-      type: "link",
-      to: "/api/adyen-balance/v2",
-      label: "Versioned API",
+      label: "مستندات فهم",
     },
   ],
   redirects: [{ from: "/", to: "/documentation/introduction" }],
   apis: [
     {
       type: "file",
-      input: "./openapi.json",
+      input: "./openapi.yaml",
       path: "api/rick-and-morty",
     },
     {

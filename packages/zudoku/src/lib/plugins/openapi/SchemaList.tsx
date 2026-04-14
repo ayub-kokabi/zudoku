@@ -10,6 +10,8 @@ import {
 import { Heading } from "../../components/Heading.js";
 import { Toc } from "../../components/navigation/Toc.js";
 import { PagefindSearchMeta } from "../../components/PagefindSearchMeta.js";
+import { useZudoku } from "../../hooks/index.js";
+import { t } from "../../util/i18n.js";
 import { slugify } from "../../util/slugify.js";
 import { ApiHeader } from "./ApiHeader.js";
 import { useCreateQuery } from "./client/useCreateQuery.js";
@@ -36,6 +38,9 @@ const GET_SCHEMAS = graphql(/* GraphQL */ `
 
 export function SchemaList() {
   const { input, type, versions, version, options } = useOasConfig();
+  const { options: zudokuOptions } = useZudoku();
+  const lang = zudokuOptions?.site?.lang;
+
   const schemasQuery = useCreateQuery(GET_SCHEMAS, {
     input,
     type,
@@ -53,10 +58,20 @@ export function SchemaList() {
     return (
       <div>
         <Helmet>
-          <title>Schemas {showVersions ? version : ""}</title>
-          <meta name="description" content="List of schemas used by the API." />
+          <title>
+            {t(lang, "schemaInfo.schemas", "Schemas")}{" "}
+            {showVersions ? version : ""}
+          </title>
+          <meta
+            name="description"
+            content={t(
+              lang,
+              "schemaInfo.schemas.description",
+              "List of schemas used by the API.",
+            )}
+          />
         </Helmet>
-        No schemas found
+        {t(lang, "schemaInfo.schemas.noSchemas", "No schemas found")}
       </div>
     );
   }
@@ -69,13 +84,27 @@ export function SchemaList() {
     >
       <PagefindSearchMeta name="category">{title}</PagefindSearchMeta>
       <Helmet>
-        <title>Schemas {showVersions ? version : ""}</title>
-        <meta name="description" content="List of schemas used by the API." />
+        <title>
+          {t(lang, "schemaInfo.schemas", "Schemas")}{" "}
+          {showVersions ? version : ""}
+        </title>
+        <meta
+          name="description"
+          content={t(
+            lang,
+            "schemaInfo.schemas.description",
+            "List of schemas used by the API.",
+          )}
+        />
       </Helmet>
       <div className="pt-(--padding-content-top) pb-(--padding-content-bottom)">
-        <ApiHeader title={title} heading="Schemas" headingId="schemas" />
+        <ApiHeader
+          title={title}
+          heading={t(lang, "schemaInfo.schemas", "Schemas")}
+          headingId="schemas"
+        />
         <hr className="my-8" />
-        <div className="flex flex-col gap-y-5">
+        <div className="flex flex-col gap-y-5" dir="ltr">
           {schemas.map((schema) => (
             <Collapsible key={schema.name} className="group" defaultOpen>
               <Heading

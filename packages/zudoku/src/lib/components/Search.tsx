@@ -3,12 +3,16 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { isSearchPlugin } from "../core/plugins.js";
 import { focusRing } from "../ui/util.js";
 import { cn } from "../util/cn.js";
+import { t } from "../util/i18n.js";
 import { getOS } from "../util/os.js";
 import { ClientOnly } from "./ClientOnly.js";
 import { useZudoku } from "./context/ZudokuContext.js";
 
 export const Search = ({ className }: { className?: string }) => {
   const ctx = useZudoku();
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+
   const [isOpen, setIsOpen] = useState(false);
   const onOpen = useCallback(() => setIsOpen(true), []);
   const onClose = useCallback(() => setIsOpen(false), []);
@@ -49,7 +53,7 @@ export const Search = ({ className }: { className?: string }) => {
       >
         <div className="flex items-center gap-2">
           <SearchIcon size={14} />
-          Search
+          {t(lang, "search.title", "Search")}
         </div>
         <ClientOnly>
           <KbdShortcut />

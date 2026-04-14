@@ -20,7 +20,8 @@
       "!examples/many-apis/apis",
       "!packages/zudoku/standalone",
       "!packages/zudoku/src/lib/plugins/openapi/graphql",
-      "!**/*.{md,mdx}"
+      "!**/*.{md,mdx}",
+      "!examples/with-vite-config/stats.html"
     ]
   },
   "formatter": {

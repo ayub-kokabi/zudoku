@@ -10,6 +10,7 @@ import {
   SquareCodeIcon,
 } from "lucide-react";
 import { useState } from "react";
+import { useZudoku } from "zudoku/components";
 import { Button } from "zudoku/ui/Button.js";
 import {
   Collapsible,
@@ -28,6 +29,7 @@ import { SyntaxHighlight } from "zudoku/ui/SyntaxHighlight.js";
 import { cn } from "../../../../util/cn.js";
 import createVariantComponent from "../../../../util/createVariantComponent.js";
 import { humanFileSize } from "../../../../util/humanFileSize.js";
+import { getDirection, t } from "../../../../util/i18n.js";
 import {
   CollapsibleHeader,
   CollapsibleHeaderTrigger,
@@ -164,6 +166,10 @@ export const ResponseTab = ({
   fileName?: string;
   blob?: Blob;
 }) => {
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
+
   const detectedLanguage = detectLanguage(headers);
   const jsonContent = tryParseJson(body);
   const beautifiedBody = jsonContent || body;
@@ -173,9 +179,7 @@ export const ResponseTab = ({
 
   const types = useQuery({
     queryKey: ["types", beautifiedBody],
-    queryFn: async () => {
-      return convertToTypes(JSON.parse(beautifiedBody));
-    },
+    queryFn: async () => convertToTypes(JSON.parse(beautifiedBody)),
     enabled: view === "types" && !isBinary,
   });
 
@@ -194,14 +198,36 @@ export const ResponseTab = ({
 
   const sortedHeaders = sortHeadersByRelevance([...headers]);
 
+  const renderHeaderToggle = (count: number, isShow: boolean) => (
+    <CollapsibleTrigger className="justify-center col-span-2 text-xs text-muted-foreground hover:text-primary border-b h-8 flex items-center gap-2">
+      {isShow
+        ? t(
+            lang,
+            "playground.resultPanel.showMore",
+            `Show ${count} more headers`,
+          ).replace("{count}", String(count))
+        : t(lang, "playground.resultPanel.hideHeaders", "Hide headers")}
+      {isShow ? <PlusCircleIcon size={12} /> : <MinusCircleIcon size={12} />}
+    </CollapsibleTrigger>
+  );
+
   return (
-    <>
+    <div dir={dir}>
+      {/* بخش Request Headers */}
       <Collapsible defaultOpen>
         <CollapsibleHeaderTrigger>
-          <CornerDownRightIcon size={14} aria-hidden="true" />
-          <CollapsibleHeader>Request Headers</CollapsibleHeader>
+          <CornerDownRightIcon size={14} className="rtl:rotate-90" />
+          <CollapsibleHeader>
+            {t(
+              lang,
+              "playground.resultPanel.requestHeaders",
+              "Request Headers",
+            )}
+          </CollapsibleHeader>
         </CollapsibleHeaderTrigger>
-        <CollapsibleContent>
+        <CollapsibleContent dir="ltr">
+          {" "}
+          {/* هدرها همیشه LTR باشند */}
           <div className="grid grid-cols-[2fr_3fr] gap-x-6 text-sm">
             {request.headers
               .slice(0, MAX_HEADERS_TO_SHOW)
@@ -213,15 +239,6 @@ export const ResponseTab = ({
               ))}
             {request.headers.length > MAX_HEADERS_TO_SHOW && (
               <Collapsible className="col-span-full grid-cols-subgrid grid group">
-                <CollapsibleTrigger className="data-[state=open]:hidden justify-center col-span-2 text-xs text-muted-foreground hover:text-primary border-b h-8 flex items-center gap-2">
-                  Show {request.headers.length - MAX_HEADERS_TO_SHOW} more
-                  headers
-                  <PlusCircleIcon
-                    size={12}
-                    className="text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                </CollapsibleTrigger>
                 <CollapsibleContent className="col-span-full grid grid-cols-subgrid">
                   {request.headers
                     .slice(MAX_HEADERS_TO_SHOW)
@@ -231,15 +248,14 @@ export const ResponseTab = ({
                         <RowValue value={value} header={key} />
                       </Row>
                     ))}
-                  <CollapsibleTrigger className="justify-center col-span-2 text-xs text-muted-foreground hover:text-primary border-b h-8 flex items-center gap-2">
-                    Hide {request.headers.length - MAX_HEADERS_TO_SHOW} headers
-                    <MinusCircleIcon
-                      size={12}
-                      className="text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                  </CollapsibleTrigger>
                 </CollapsibleContent>
+                {renderHeaderToggle(
+                  request.headers.length - MAX_HEADERS_TO_SHOW,
+                  true,
+                )}
+                <div className="group-data-[state=closed]:hidden contents">
+                  {renderHeaderToggle(0, false)}
+                </div>
               </Collapsible>
             )}
           </div>
@@ -248,10 +264,16 @@ export const ResponseTab = ({
 
       <Collapsible defaultOpen>
         <CollapsibleHeaderTrigger>
-          <CornerDownLeftIcon size={14} aria-hidden="true" />
-          <CollapsibleHeader>Response Headers</CollapsibleHeader>
+          <CornerDownLeftIcon size={14} className="rtl:-rotate-90" />
+          <CollapsibleHeader>
+            {t(
+              lang,
+              "playground.resultPanel.responseHeaders",
+              "Response Headers",
+            )}
+          </CollapsibleHeader>
         </CollapsibleHeaderTrigger>
-        <CollapsibleContent>
+        <CollapsibleContent dir="ltr">
           <div className="grid grid-cols-[2fr_3fr] gap-x-6 text-sm">
             {sortedHeaders.slice(0, MAX_HEADERS_TO_SHOW).map(([key, value]) => (
               <Row key={key}>
@@ -261,14 +283,6 @@ export const ResponseTab = ({
             ))}
             {sortedHeaders.length > MAX_HEADERS_TO_SHOW && (
               <Collapsible className="col-span-full grid-cols-subgrid grid group">
-                <CollapsibleTrigger className="data-[state=open]:hidden justify-center col-span-2 text-xs text-muted-foreground hover:text-primary border-b h-8 flex items-center gap-2">
-                  Show {sortedHeaders.length - MAX_HEADERS_TO_SHOW} more headers
-                  <PlusCircleIcon
-                    size={12}
-                    className="text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                </CollapsibleTrigger>
                 <CollapsibleContent className="col-span-full grid grid-cols-subgrid">
                   {sortedHeaders
                     .slice(MAX_HEADERS_TO_SHOW)
@@ -278,15 +292,14 @@ export const ResponseTab = ({
                         <RowValue value={value} header={key} />
                       </Row>
                     ))}
-                  <CollapsibleTrigger className="justify-center col-span-2 text-xs text-muted-foreground hover:text-primary border-b h-8 flex items-center gap-2">
-                    Hide {sortedHeaders.length - MAX_HEADERS_TO_SHOW} headers
-                    <MinusCircleIcon
-                      size={12}
-                      className="text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                  </CollapsibleTrigger>
                 </CollapsibleContent>
+                {renderHeaderToggle(
+                  sortedHeaders.length - MAX_HEADERS_TO_SHOW,
+                  true,
+                )}
+                <div className="group-data-[state=closed]:hidden contents">
+                  {renderHeaderToggle(0, false)}
+                </div>
               </Collapsible>
             )}
           </div>
@@ -295,51 +308,75 @@ export const ResponseTab = ({
 
       <div className="flex gap-2 justify-between items-center border-b px-2 flex-0">
         <CollapsibleHeader className="flex items-center gap-2">
-          <SquareCodeIcon size={14} aria-hidden="true" />
-          Response body
+          <SquareCodeIcon size={14} />
+          {t(lang, "playground.resultPanel.responseBody", "Response Body")}
         </CollapsibleHeader>
         {jsonContent && !isBinary && (
           <Select
             value={view}
-            onValueChange={(value) =>
-              setView(value as "formatted" | "raw" | "types")
-            }
+            onValueChange={(v: "formatted" | "raw" | "types") => setView(v)}
           >
-            <SelectTrigger className="max-w-32 border-0 bg-transparent">
-              <SelectValue placeholder="View" />
+            <SelectTrigger
+              className="max-w-40 border-0 bg-transparent"
+              dir={dir}
+            >
+              <SelectValue />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="formatted">Formatted</SelectItem>
-              <SelectItem value="raw">Raw</SelectItem>
-              <SelectItem value="types">Types</SelectItem>
+            <SelectContent dir={dir}>
+              <SelectItem value="formatted">
+                {t(lang, "playground.resultPanel.view.formatted", "Formatted")}
+              </SelectItem>
+              <SelectItem value="raw">
+                {t(lang, "playground.resultPanel.view.raw", "Raw")}
+              </SelectItem>
+              <SelectItem value="types">
+                {t(lang, "playground.resultPanel.view.types", "Types")}
+              </SelectItem>
             </SelectContent>
           </Select>
         )}
       </div>
-      <div className="flex-1">
+
+      <div className="flex-1" dir="ltr">
         {isBinary ? (
           blob && isAudioContentType(getContentType(headers)) ? (
             <AudioPlayer
               blob={blob}
-              fileName={fileName ?? "audio"}
+              fileName={
+                fileName ?? t(lang, "playground.resultPanel.audio", "audio")
+              }
               size={size}
               onDownload={handleDownload}
             />
           ) : (
-            <div className="p-4 text-center">
+            <div className="p-4 text-center" dir={dir}>
               <div className="flex flex-col items-center gap-4">
-                <div className="text-lg font-semibold">Binary Content</div>
+                <div className="text-lg font-semibold">
+                  {t(
+                    lang,
+                    "playground.resultPanel.binaryTitle",
+                    "Binary Content",
+                  )}
+                </div>
                 <div className="text-sm text-muted-foreground">
-                  This response contains binary data that cannot be displayed as
-                  text.
+                  {t(
+                    lang,
+                    "playground.resultPanel.binaryContent",
+                    "This response contains binary data...",
+                  )}
                 </div>
                 <Button
                   onClick={handleDownload}
                   className="flex items-center gap-2"
-                  disabled={!blob}
                 >
-                  <DownloadIcon className="h-4 w-4" aria-hidden="true" />
-                  Download {fileName || "file"} ({humanFileSize(size)})
+                  <DownloadIcon className="h-4 w-4" />
+                  {t(
+                    lang,
+                    "playground.resultPanel.downloadFile",
+                    "Download file",
+                  )
+                    .replace("{fileName}", fileName || "file")
+                    .replace("{size}", humanFileSize(size))}
                 </Button>
               </div>
             </div>
@@ -352,10 +389,8 @@ export const ResponseTab = ({
             language={
               view === "types"
                 ? "typescript"
-                : view === "raw"
-                  ? jsonContent
-                    ? "text"
-                    : detectedLanguage
+                : view === "raw" && !jsonContent
+                  ? detectedLanguage
                   : "json"
             }
             code={
@@ -368,6 +403,6 @@ export const ResponseTab = ({
           />
         )}
       </div>
-    </>
+    </div>
   );
 };

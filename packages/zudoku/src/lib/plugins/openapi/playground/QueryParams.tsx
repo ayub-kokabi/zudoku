@@ -1,9 +1,11 @@
 import { Unlink2Icon } from "lucide-react";
 import { type Control, useFormContext } from "react-hook-form";
+import { useZudoku } from "zudoku/components";
 import { Checkbox } from "zudoku/ui/Checkbox.js";
 import { Collapsible, CollapsibleContent } from "zudoku/ui/Collapsible.js";
 import { Autocomplete } from "../../../components/Autocomplete.js";
 import { MultiSelect } from "../../../components/MultiSelect.js";
+import { getDirection, t } from "../../../util/i18n.js";
 import {
   CollapsibleHeader,
   CollapsibleHeaderTrigger,
@@ -48,13 +50,19 @@ export const QueryParams = ({
 
   const hasSchemaParams = schemaQueryParams.length > 0;
 
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
+
   return (
-    <Collapsible defaultOpen>
+    <Collapsible dir={dir} defaultOpen>
       <CollapsibleHeaderTrigger>
         <Unlink2Icon size={16} aria-hidden="true" />
-        <CollapsibleHeader>Query Parameters</CollapsibleHeader>
+        <CollapsibleHeader>
+          {t(lang, "openApi.parameters.query", "Query Parameters")}
+        </CollapsibleHeader>
       </CollapsibleHeaderTrigger>
-      <CollapsibleContent className="CollapsibleContent">
+      <CollapsibleContent className="CollapsibleContent" dir={dir}>
         <ParamsGrid>
           {manager.fields.map((field, i) => {
             const currentParam = schemaQueryParams.find(

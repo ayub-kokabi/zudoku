@@ -87,12 +87,16 @@ export const GOOGLE_FONTS = [
   "Plus Jakarta Sans", "DM Sans", "IBM Plex Sans", "Geist", "Oxanium",
   "Architects Daughter", "Merriweather", "Playfair Display", "Lora",
   "Source Serif Pro", "Libre Baskerville", "Space Grotesk", "JetBrains Mono",
-  "Fira Code", "Source Code Pro", "IBM Plex Mono", "Roboto Mono", "Space Mono", "Geist Mono",
+  "Fira Code", "Source Code Pro", "IBM Plex Mono", "Roboto Mono", "Space Mono", "Geist Mono","Vazirmatn", "Vazircode"
 ] as const;
 type GoogleFont = (typeof GOOGLE_FONTS)[number];
 
-const getGoogleFontUrl = (font: string) =>
-  `https://fonts.googleapis.com/css2?family=${font.replaceAll(/\s+/g, "+")}:wght@400;500;600;700&display=swap`;
+const getGoogleFontUrl = (font: string) => {
+  if (font === "Vazircode") {
+    return "https://cdn.jsdelivr.net/gh/rastikerdar/vazir-code-font@v1.1.2/dist/font-face.css";
+  }
+  return `https://fonts.googleapis.com/css2?family=${font.replaceAll(/\s+/g, "+")}:wght@400;500;600;700&display=swap`;
+};
 
 const processFont = (fontValue: string) => {
   const families = fontValue
@@ -108,6 +112,13 @@ const processFontConfig = (fontConfig?: FontConfig) => {
   if (!fontConfig) return { url: undefined, fontFamily: undefined };
 
   if (typeof fontConfig === "string") {
+    if (fontConfig === "Vazircode") {
+      return {
+        url: getGoogleFontUrl("Vazircode"),
+        fontFamily: "'Vazir Code', monospace",
+      };
+    }
+
     if (GOOGLE_FONTS.includes(fontConfig as GoogleFont)) {
       return {
         url: getGoogleFontUrl(fontConfig),

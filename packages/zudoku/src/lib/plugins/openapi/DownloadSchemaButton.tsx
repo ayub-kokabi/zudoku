@@ -15,6 +15,7 @@ import {
 } from "zudoku/ui/DropdownMenu.js";
 import { AiAssistantMenuItems } from "../../components/AiAssistantMenuItems.js";
 import { useZudoku } from "../../components/context/ZudokuContext.js";
+import { getDirection, t } from "../../util/i18n.js";
 import { useCopyToClipboard } from "../../util/useCopyToClipboard.js";
 
 export const DownloadSchemaButton = ({
@@ -24,6 +25,8 @@ export const DownloadSchemaButton = ({
 }) => {
   const [, copyToClipboard] = useCopyToClipboard();
   const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
 
   const handleDownload: MouseEventHandler<HTMLAnchorElement> = async (e) => {
     const isExternal = downloadUrl.includes("://");
@@ -52,14 +55,14 @@ export const DownloadSchemaButton = ({
   };
 
   return (
-    <ButtonGroup>
+    <ButtonGroup dir={dir}>
       <Button variant="outline" asChild>
         <a href={downloadUrl} download onClick={handleDownload}>
           <DownloadIcon />
-          Download schema
+          {t(lang, "schema.download", "Download schema")}
         </a>
       </Button>
-      <DropdownMenu>
+      <DropdownMenu dir={dir}>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="px-1.5">
             <ChevronDownIcon size={14} />
@@ -69,7 +72,7 @@ export const DownloadSchemaButton = ({
           <DropdownMenuItem asChild>
             <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
               <ExternalLinkIcon size={14} />
-              Open in new tab
+              {t(lang, "schema.openInNewTab", "Open in new tab")}
             </a>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -80,7 +83,7 @@ export const DownloadSchemaButton = ({
             }}
           >
             <CopyIcon size={14} />
-            Copy to clipboard
+            {t(lang, "schema.copyToClipboard", "Copy to clipboard")}
           </DropdownMenuItem>
           <AiAssistantMenuItems
             aiAssistants={options.aiAssistants}

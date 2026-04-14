@@ -54,7 +54,7 @@ export const ParameterListItem = ({
   return (
     <Item>
       <ItemContent className="gap-y-2">
-        <div>
+        <div dir="ltr">
           <ItemTitle className="inline me-2">
             {isCollapsible ? (
               <button

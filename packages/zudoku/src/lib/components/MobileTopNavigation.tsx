@@ -28,6 +28,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../ui/Drawer.js";
+import { getDirection } from "../util/i18n.js";
 import { ClientOnly } from "./ClientOnly.js";
 import { useCurrentNavigation, useZudoku } from "./context/ZudokuContext.js";
 import { PoweredByZudoku } from "./navigation/PoweredByZudoku.js";
@@ -130,6 +131,7 @@ export const MobileTopNavigation = () => {
     getProfileMenuItems,
   } = context;
   const headerNavigation = header?.navigation ?? [];
+  const dir = getDirection(site?.lang);
   const { isAuthenticated, profile, isAuthEnabled } = authState;
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -140,7 +142,7 @@ export const MobileTopNavigation = () => {
 
   return (
     <Drawer
-      direction={site?.dir === "rtl" ? "left" : "right"}
+      direction={dir === "rtl" ? "left" : "right"}
       open={drawerOpen}
       onOpenChange={setDrawerOpen}
     >
@@ -151,7 +153,7 @@ export const MobileTopNavigation = () => {
         <PageProgress />
       </div>
       <DrawerContent
-        className="lg:hidden h-dvh inset-e-0 start-auto w-[340px] rounded-none"
+        className="lg:hidden h-dvh inset-e-0 start-auto w-85 rounded-none"
         aria-describedby={undefined}
       >
         <div className="py-2 h-full flex flex-col">

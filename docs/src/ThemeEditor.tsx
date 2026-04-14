@@ -41,6 +41,7 @@ const camelToKebabCase = (str: string) =>
 
 export const ThemeEditor = () => {
   const { resolvedTheme, setTheme } = useTheme();
+  const currentTheme = resolvedTheme === "dark" ? "dark" : "light";
   const [color, setColor] = useState<string>();
   const [radius, setRadius] = useState<number>();
   const [customCss, setCustomCss] = useState("");
@@ -52,10 +53,11 @@ export const ThemeEditor = () => {
 
   useLayoutEffect(() => {
     if (activeColor) {
-      Object.entries(activeColor.cssVars[resolvedTheme]).forEach(([key]) => {
+      const themeVars = activeColor.cssVars[currentTheme];
+      Object.entries(themeVars).forEach(([key, value]) => {
         document.documentElement.style.setProperty(
           `--${camelToKebabCase(key)}`,
-          activeColor.cssVars[resolvedTheme][key],
+          value,
         );
       });
     }
@@ -69,15 +71,15 @@ export const ThemeEditor = () => {
     return () => {
       document.documentElement.style.removeProperty("--radius");
 
-      if (!activeColor?.cssVars[resolvedTheme]) return;
+      if (!activeColor?.cssVars[currentTheme]) return;
 
-      Object.entries(activeColor.cssVars[resolvedTheme]).forEach(([key]) => {
+      Object.entries(activeColor.cssVars[currentTheme]).forEach(([key]) => {
         document.documentElement.style.removeProperty(
           `--${camelToKebabCase(key)}`,
         );
       });
     };
-  }, [activeColor, resolvedTheme, radius]);
+  }, [activeColor, currentTheme, radius]);
 
   const handleReset = () => {
     setColor(undefined);
@@ -131,7 +133,7 @@ export const ThemeEditor = () => {
               Get Theme Config
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[666px]! w-full">
+          <DialogContent className="max-w-166.5! w-full">
             <DialogHeader>
               <DialogTitle>Theme</DialogTitle>
               <DialogDescription>
@@ -140,7 +142,7 @@ export const ThemeEditor = () => {
             </DialogHeader>
             <SyntaxHighlight
               language="css"
-              className="max-h-[350px]"
+              className="max-h-87.5"
               showLanguageIndicator
               code={JSON.stringify(themeConfig, null, 2)}
             />
@@ -153,7 +155,7 @@ export const ThemeEditor = () => {
               Paste theme
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[666px]! w-full">
+          <DialogContent className="max-w-166.5! w-full">
             <DialogHeader>
               <DialogTitle>Paste Custom CSS</DialogTitle>
               <DialogDescription>
@@ -172,7 +174,7 @@ export const ThemeEditor = () => {
             <div className="space-y-4">
               <Textarea
                 placeholder="Paste your CSS here..."
-                className="min-h-[200px] font-mono text-sm"
+                className="min-h-50 font-mono text-sm"
                 defaultValue={customCss}
                 onChange={(e) => {
                   const css = e.target.value;
@@ -280,14 +282,14 @@ export const ThemeEditor = () => {
                     style={
                       {
                         "--theme-primary":
-                          activeColor?.activeColor[resolvedTheme],
+                          activeColor?.activeColor[currentTheme],
                       } as React.CSSProperties
                     }
                   >
                     <div
                       className="w-4 h-4 rounded-full me-2"
                       style={{
-                        backgroundColor: color.activeColor[resolvedTheme],
+                        backgroundColor: color.activeColor[currentTheme],
                       }}
                     />
 

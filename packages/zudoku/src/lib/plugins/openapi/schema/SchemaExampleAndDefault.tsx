@@ -24,7 +24,7 @@ export const SchemaExampleAndDefault = ({
         </div>
       )}
       {defaultValue !== undefined && (
-        <div>
+        <div dir="ltr">
           <span className="text-muted-foreground">Default: </span>
           <SelectOnClick className="border rounded-sm px-1 font-mono">
             {typeof defaultValue === "object" ||

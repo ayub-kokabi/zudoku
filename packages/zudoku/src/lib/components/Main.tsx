@@ -3,6 +3,7 @@ import { type PropsWithChildren, useState } from "react";
 import { useNavigation } from "react-router";
 import { Drawer, DrawerTrigger } from "zudoku/ui/Drawer.js";
 import { cn } from "../util/cn.js";
+import { getDirection } from "../util/i18n.js";
 import { useCurrentNavigation, useZudoku } from "./context/ZudokuContext.js";
 import { Navigation } from "./navigation/Navigation.js";
 import { Slot } from "./Slot.js";
@@ -13,10 +14,11 @@ export const Main = ({ children }: PropsWithChildren) => {
   const hasNavigation = navigation.length > 0;
   const isNavigating = useNavigation().state === "loading";
   const { options } = useZudoku();
+  const dir = getDirection(options.site?.lang);
 
   return (
     <Drawer
-      direction={options.site?.dir === "rtl" ? "right" : "left"}
+      direction={dir === "rtl" ? "right" : "left"}
       open={isDrawerOpen}
       onOpenChange={(open) => setDrawerOpen(open)}
     >
@@ -27,7 +29,7 @@ export const Main = ({ children }: PropsWithChildren) => {
         />
       )}
       {hasNavigation && (
-        <div className="lg:hidden m-0 p-0 md:-mx-4 md:px-4 py-2 sticky bg-background/80 backdrop-blur-xs z-10 top-0 start-0 end-0 border-b">
+        <div className="lg:hidden m-0 p-0 md:-mx-4 md:px-4 py-2 sticky bg-background/80 backdrop-blur-xs z-10 top-0 inset-s-0 inset-e-0 border-b">
           <DrawerTrigger className="flex items-center gap-2 px-4">
             <PanelLeftIcon size={16} strokeWidth={1.5} />
             <span className="text-sm">Menu</span>

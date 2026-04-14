@@ -10,8 +10,10 @@ import {
 } from "react";
 import type { TocEntry } from "../../../vite/mdx/rehype-extract-toc-with-jsx.js";
 import { cn } from "../../util/cn.js";
+import { t } from "../../util/i18n.js";
 import { AnchorLink } from "../AnchorLink.js";
 import { useViewportAnchor } from "../context/ViewportAnchorContext.js";
+import { useZudoku } from "../context/ZudokuContext.js";
 import { InlineCode } from "../InlineCode.js";
 
 const HastRichText = lazy(() => import("../../util/hastToJsx.js"));
@@ -53,6 +55,9 @@ const TocItem = ({
 );
 
 export const Toc = ({ entries }: { entries: TocEntry[] }) => {
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+
   const { activeAnchor } = useViewportAnchor();
   const listWrapperRef = useRef<HTMLUListElement>(null);
   const paintedOnce = useRef(false);
@@ -94,7 +99,7 @@ export const Toc = ({ entries }: { entries: TocEntry[] }) => {
     <aside className="sticky scrollbar top-8 lg:top-(--header-height) h-[calc(100vh-var(--header-height))] pt-(--padding-content-top) pb-(--padding-content-bottom) overflow-y-auto ps-1 text-sm">
       <div className="flex items-center gap-2 font-medium mb-2">
         <ListTreeIcon size={16} />
-        On this page
+        {t(lang, "toc.title", "On this page")}
       </div>
       <div className="relative ms-px ps-4">
         <div className="absolute inset-0 end-auto bg-border w-[1.5px]" />

@@ -186,6 +186,7 @@ export const Sidecar = ({
       ref={ref}
       className="flex flex-col sticky top-(--scroll-padding) gap-4"
       data-pagefind-ignore="all"
+      dir="ltr"
     >
       <SidecarBox.Root>
         <SidecarBox.Head className="py-1.5">
@@ -241,7 +242,7 @@ export const Sidecar = ({
             <SyntaxHighlight
               embedded
               language={selectedLang}
-              className="[--scrollbar-color:gray] rounded-none text-xs max-h-[200px]"
+              className="[--scrollbar-color:gray] rounded-none text-sm max-h-[200px]"
               // biome-ignore lint/style/noNonNullAssertion: code is guaranteed to be defined
               code={httpSnippetCode!}
             />

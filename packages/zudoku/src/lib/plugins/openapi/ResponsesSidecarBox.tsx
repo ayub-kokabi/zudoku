@@ -1,6 +1,6 @@
 import { ChevronsDownUpIcon, ChevronsUpDownIcon, InfoIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "zudoku/components";
+import { Button, useZudoku } from "zudoku/components";
 import {
   Collapsible,
   CollapsibleContent,
@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "zudoku/ui/Tooltip.js";
+import { getDirection, t } from "../../util/i18n.js";
 import type { ResponseItem } from "./graphql/graphql.js";
 import * as SidecarBox from "./SidecarBox.js";
 import { SidecarExamples } from "./SidecarExamples.js";
@@ -49,11 +50,15 @@ export const ResponsesSidecarBox = ({
     setSelectedExampleIndex(0);
   }, [internalSelectedResponse]);
 
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
+
   return (
-    <Collapsible className="group/collapsible" defaultOpen>
+    <Collapsible className="group/collapsible" dir={dir} defaultOpen>
       <SidecarBox.Root>
         <SidecarBox.Head className="text-xs flex justify-between items-center">
-          <div className="flex items-center gap-1 font-medium shrink-0">
+          <div className="flex items-center gap-1 font-medium shrink-0 me-auto">
             <CollapsibleTrigger asChild>
               <Button
                 variant="ghost"
@@ -64,7 +69,7 @@ export const ResponsesSidecarBox = ({
                 <ChevronsUpDownIcon className="size-[1em] group-data-[state=open]/collapsible:hidden" />
               </Button>
             </CollapsibleTrigger>
-            Example Responses
+            {t(lang, "response.examples", "Example Responses")}
             {isGenerated && (
               <TooltipProvider>
                 <Tooltip>
@@ -72,13 +77,20 @@ export const ResponsesSidecarBox = ({
                     <InfoIcon size={13} />
                   </TooltipTrigger>
                   <TooltipContent>
-                    This example is auto-generated from the schema.
+                    {t(
+                      lang,
+                      "response.generatedExample",
+                      "This example is auto-generated from the schema.",
+                    )}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             )}
           </div>
-          <div className="group-data-[state=closed]/collapsible:invisible">
+          <div
+            className="group-data-[state=closed]/collapsible:invisible"
+            dir="ltr"
+          >
             <NativeSelect
               className="text-xs h-fit py-1 -my-1 bg-background"
               value={internalSelectedResponse}
@@ -95,7 +107,7 @@ export const ResponsesSidecarBox = ({
             </NativeSelect>
           </div>
         </SidecarBox.Head>
-        <CollapsibleContent>
+        <CollapsibleContent dir="ltr">
           <SidecarExamples
             selectedContentIndex={selectedContentIndex}
             selectedExampleIndex={selectedExampleIndex}

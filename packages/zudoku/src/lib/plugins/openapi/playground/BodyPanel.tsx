@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Button } from "zudoku/components";
+import { Button, useZudoku } from "zudoku/components";
 import { Collapsible, CollapsibleContent } from "zudoku/ui/Collapsible.js";
 import {
   DropdownMenu,
@@ -19,6 +19,7 @@ import {
 import { Textarea } from "zudoku/ui/Textarea.js";
 import { cn } from "../../../util/cn.js";
 import { humanFileSize } from "../../../util/humanFileSize.js";
+import { getDirection, t } from "../../../util/i18n.js";
 import type { MediaTypeObject } from "../graphql/graphql.js";
 import {
   CollapsibleHeader,
@@ -94,14 +95,18 @@ export const BodyPanel = ({ content }: { content?: MediaTypeObject[] }) => {
     },
   });
 
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
+
   return (
-    <Collapsible defaultOpen>
+    <Collapsible dir={dir} defaultOpen>
       <CollapsibleHeaderTrigger className="items-center">
         <FileInput size={16} />
         <CollapsibleHeader className="flex items-center justify-between">
-          Body
+          {t(lang, "operation.requestBody", "Body Request")}
           <div className="flex items-center">
-            <DropdownMenu>
+            <DropdownMenu dir={dir}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -111,17 +116,21 @@ export const BodyPanel = ({ content }: { content?: MediaTypeObject[] }) => {
                   {bodyMode === "text" ? (
                     <>
                       <ScanTextIcon size={14} />
-                      Text
+                      {t(lang, "playground.BodyPanel.bodyMode.text", "Text")}
                     </>
                   ) : bodyMode === "file" ? (
                     <>
                       <PaperclipIcon size={14} />
-                      File
+                      {t(lang, "playground.BodyPanel.bodyMode.file", "File")}
                     </>
                   ) : (
                     <>
                       <Grid2x2PlusIcon size={14} />
-                      Multipart
+                      {t(
+                        lang,
+                        "playground.BodyPanel.bodyMode.multipart",
+                        "Multipart",
+                      )}
                     </>
                   )}
                   <ChevronDownIcon size={14} />
@@ -133,7 +142,9 @@ export const BodyPanel = ({ content }: { content?: MediaTypeObject[] }) => {
                   className="gap-2"
                 >
                   <ScanTextIcon size={14} />
-                  <span className="flex-1">Text</span>
+                  <span className="flex-1">
+                    {t(lang, "playground.BodyPanel.bodyMode.text", "Text")}
+                  </span>
                   <span>
                     {body.length > 0 && (
                       <div className="w-1.5 h-1.5 bg-primary rounded-full" />
@@ -145,7 +156,9 @@ export const BodyPanel = ({ content }: { content?: MediaTypeObject[] }) => {
                   className="gap-2"
                 >
                   <PaperclipIcon size={14} />
-                  <span className="flex-1">File</span>
+                  <span className="flex-1">
+                    {t(lang, "playground.BodyPanel.bodyMode.file", "File")}
+                  </span>
                   <span>
                     {file && (
                       <div className="w-1.5 h-1.5 bg-primary rounded-full" />
@@ -157,7 +170,13 @@ export const BodyPanel = ({ content }: { content?: MediaTypeObject[] }) => {
                   className="gap-2"
                 >
                   <Grid2x2PlusIcon size={14} strokeWidth={1.5} />
-                  <span className="flex-1">Multipart</span>
+                  <span className="flex-1">
+                    {t(
+                      lang,
+                      "playground.BodyPanel.bodyMode.multipart",
+                      "Multipart",
+                    )}
+                  </span>
                   <span>
                     {multipartFormFields?.some((field) => field.active) && (
                       <div className="w-1.5 h-1.5 bg-primary rounded-full" />
@@ -194,7 +213,10 @@ export const BodyPanel = ({ content }: { content?: MediaTypeObject[] }) => {
           </div>
         </CollapsibleHeader>
       </CollapsibleHeaderTrigger>
-      <CollapsibleContent className="CollapsibleContent flex flex-col gap-2">
+      <CollapsibleContent
+        className="CollapsibleContent flex flex-col gap-2"
+        dir="ltr"
+      >
         {bodyMode === "text" && (
           <Textarea
             {...register("body")}
@@ -209,7 +231,7 @@ export const BodyPanel = ({ content }: { content?: MediaTypeObject[] }) => {
             role="region"
             aria-label="File upload drop zone"
             className={cn(
-              "flex flex-col items-center justify-center gap-4 min-h-[300px]",
+              "flex flex-col items-center justify-center gap-4 min-h-75",
             )}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}

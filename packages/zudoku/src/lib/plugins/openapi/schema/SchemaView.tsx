@@ -21,7 +21,7 @@ import { isArrayType, isBasicType } from "./utils.js";
 const renderMarkdown = (content?: string) =>
   content && (
     <Markdown
-      className="text-sm leading-normal line-clamp-4"
+      className="text-sm leading-normal line-clamp-4 max-w-none"
       content={content}
     />
   );
@@ -194,7 +194,9 @@ const ObjectSchemaView = ({
       {cardHeader}
       {schema.description && (
         <FrameHeader>
-          <FrameDescription>{schema.description}</FrameDescription>
+          <FrameDescription className="max-w-none">
+            {schema.description}
+          </FrameDescription>
         </FrameHeader>
       )}
       {(nonDeprecatedGroups.length > 0 ||

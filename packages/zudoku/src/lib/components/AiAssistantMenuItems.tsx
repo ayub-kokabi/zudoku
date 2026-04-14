@@ -6,6 +6,8 @@ import type {
 } from "../../config/validators/ZudokuConfig.js";
 import { ChatGPTLogo } from "../plugins/markdown/assets/ChatGPTLogo.js";
 import { ClaudeLogo } from "../plugins/markdown/assets/ClaudeLogo.js";
+import { t } from "../util/i18n.js";
+import { useZudoku } from "./index.js";
 
 type AiAssistantContext = {
   pageUrl: string;
@@ -18,9 +20,8 @@ type ResolvedAssistant = {
   getUrl: (context: AiAssistantContext) => string;
 };
 
-const PRESETS: Record<string, ResolvedAssistant> = {
+const PRESETS: Record<string, Omit<ResolvedAssistant, "label">> = {
   claude: {
-    label: "Use in Claude",
     icon: <ClaudeLogo className="size-4" aria-hidden="true" />,
     getUrl: ({ pageUrl, type }) => {
       const contextText =
@@ -32,7 +33,6 @@ const PRESETS: Record<string, ResolvedAssistant> = {
     },
   },
   chatgpt: {
-    label: "Use in ChatGPT",
     icon: <ChatGPTLogo className="size-4" aria-hidden="true" />,
     getUrl: ({ pageUrl, type }) => {
       const contextText =
@@ -47,9 +47,18 @@ const PRESETS: Record<string, ResolvedAssistant> = {
 
 const resolveAssistant = (
   entry: string | AiAssistantCustom,
+  lang: string | undefined, // <--- ورودی جدید
 ): ResolvedAssistant | undefined => {
   if (typeof entry === "string") {
-    return PRESETS[entry];
+    const preset = PRESETS[entry];
+    if (!preset) return undefined;
+
+    const label =
+      entry === "claude"
+        ? t(lang, "ai.useInClaude", "Use in Claude")
+        : t(lang, "ai.useInChatGPT", "Use in ChatGPT");
+
+    return { ...preset, label };
   }
 
   return {
@@ -75,6 +84,9 @@ export const AiAssistantMenuItems = ({
   getPageUrl: () => string;
   type: "docs" | "openapi";
 }) => {
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+
   const config = aiAssistants ?? DEFAULT_ASSISTANTS;
 
   if (config === false) {
@@ -82,7 +94,7 @@ export const AiAssistantMenuItems = ({
   }
 
   return config.map((entry, index) => {
-    const assistant = resolveAssistant(entry);
+    const assistant = resolveAssistant(entry, lang);
     if (!assistant) return null;
 
     return (

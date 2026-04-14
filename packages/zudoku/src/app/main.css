@@ -55,6 +55,15 @@
   a {
     @apply font-normal underline-offset-4 hover:text-primary;
   }
+  code {
+    font-weight: 400;
+  }
+  code::before {
+    content: none;
+  }
+  code::after {
+    content: none;
+  }
   td code,
   th code {
     @apply whitespace-nowrap;
@@ -71,15 +80,6 @@
   }
   hr {
     @apply border-border my-4;
-  }
-  code {
-    font-weight: 400;
-  }
-  code::before {
-    content: none;
-  }
-  code::after {
-    content: none;
   }
 
   ol > li {
@@ -366,14 +366,14 @@
 
   /* Bullet with number */
   .stepper > ol > li::before {
-    @apply absolute start-0 flex items-center justify-center size-(--bullet-size);
+    @apply absolute inset-s-0 flex items-center justify-center size-(--bullet-size);
     @apply bg-muted/80 border border-border text-muted-foreground text-[calc(var(--bullet-size)/2)] font-semibold rounded-full;
     content: counter(step-counter);
   }
 
   /* Vertical line */
   .stepper > ol > li::after {
-    @apply absolute content-[''] w-[2px] bg-border -translate-x-1/2;
+    @apply absolute content-[''] w-0.5 bg-border -translate-x-1/2;
     inset-inline-start: calc(var(--bullet-size) / 2);
     top: calc(var(--bullet-size) + var(--line-spacing));
     height: calc(100% - var(--bullet-size) - (2 * var(--line-spacing)));

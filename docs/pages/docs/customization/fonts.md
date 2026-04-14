@@ -32,13 +32,13 @@ const config = {
 The following fonts are available as predefined options:
 
 **Sans Serif:** Inter, Roboto, Open Sans, Poppins, Montserrat, Outfit, Plus Jakarta Sans, DM Sans,
-IBM Plex Sans, Geist, Oxanium, Space Grotesk
+IBM Plex Sans, Geist, Oxanium, Space Grotesk, Vazirmatn, Vazircode
 
 **Serif:** Architects Daughter, Merriweather, Playfair Display, Lora, Source Serif Pro, Libre
-Baskerville
+Baskerville, Vazirmatn, Vazircode
 
 **Monospace:** JetBrains Mono, Fira Code, Source Code Pro, IBM Plex Mono, Roboto Mono, Space Mono,
-Geist Mono
+Geist Mono, Vazircode
 
 ## Custom Font URLs
 

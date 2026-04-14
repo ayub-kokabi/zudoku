@@ -18,9 +18,13 @@ import {
   SelectValue,
 } from "zudoku/ui/Select.js";
 import { TooltipProvider } from "zudoku/ui/Tooltip.js";
-import { useApiIdentities } from "../../../components/context/ZudokuContext.js";
+import {
+  useApiIdentities,
+  useZudoku,
+} from "../../../components/context/ZudokuContext.js";
 import { useHotkey } from "../../../hooks/useHotkey.js";
 import { cn } from "../../../util/cn.js";
+import { getDirection, t } from "../../../util/i18n.js";
 import { useCopyToClipboard } from "../../../util/useCopyToClipboard.js";
 import { useLatest } from "../../../util/useLatest.js";
 import type { MediaTypeObject } from "../graphql/graphql.js";
@@ -399,7 +403,7 @@ export const Playground = ({
             value={selectedServer}
             defaultValue={selectedServer}
           >
-            <SelectTrigger className="p-0 h-fit shadow-none border-none flex-row-reverse bg-transparent text-xs gap-0.5 translate-y-[4px]">
+            <SelectTrigger className="p-0 h-fit shadow-none border-none flex-row-reverse bg-transparent text-xs gap-0.5 translate-y-1">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -420,6 +424,10 @@ export const Playground = ({
     method.toUpperCase(),
   );
   const [isCopied, copyToClipboard] = useCopyToClipboard();
+
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
 
   return (
     <FormProvider
@@ -471,7 +479,7 @@ export const Playground = ({
             onLogin={onLogin}
           />
 
-          <div className="grid grid-cols-[1fr_1px_1fr] text-sm">
+          <div className="grid grid-cols-[1fr_1px_1fr] text-sm" dir="ltr">
             <div className="col-span-3 p-4 border-b flex gap-2 items-stretch">
               <div className="flex flex-1 items-center w-full border rounded-md relative overflow-hidden">
                 <div className="border-r p-2 bg-muted rounded-l-md self-stretch font-semibold font-mono flex items-center">
@@ -530,7 +538,9 @@ export const Playground = ({
                 }}
                 className="w-18"
               >
-                {queryMutation.isPending ? "Cancel" : "Send"}
+                {queryMutation.isPending
+                  ? t(lang, "playground.cancel", "Cancel")
+                  : t(lang, "playground.send", "Send")}
               </Button>
             </div>
             <div className="relative overflow-y-auto h-[80vh]">
@@ -538,7 +548,9 @@ export const Playground = ({
                 <Collapsible defaultOpen>
                   <CollapsibleHeaderTrigger>
                     <IdCardLanyardIcon size={16} aria-hidden="true" />
-                    <CollapsibleHeader>Authentication</CollapsibleHeader>
+                    <CollapsibleHeader>
+                      {t(lang, "playground.authentication", "Authentication")}
+                    </CollapsibleHeader>
                   </CollapsibleHeaderTrigger>
                   <CollapsibleContent className="CollapsibleContent">
                     <IdentitySelector
@@ -554,7 +566,9 @@ export const Playground = ({
                 <Collapsible defaultOpen>
                   <CollapsibleHeaderTrigger>
                     <ShapesIcon size={16} aria-hidden="true" />
-                    <CollapsibleHeader>Path Parameters</CollapsibleHeader>
+                    <CollapsibleHeader>
+                      {t(lang, "openApi.parameters.path", "Path Parameters")}
+                    </CollapsibleHeader>
                   </CollapsibleHeaderTrigger>
                   <CollapsibleContent className="CollapsibleContent">
                     <PathParams url={url} control={control} />
@@ -578,13 +592,13 @@ export const Playground = ({
               isFinished={isFinished}
               progress={progress}
               tip={
-                <div className="text-xs w-full">
+                <div className="text-xs w-full" dir={dir}>
                   <span className="text-muted-foreground">
-                    Press{" "}
+                    {t(lang, "playground.hotkeyPrefix", "Press")}{" "}
                     <kbd className="text-foreground border rounded m-0.5 px-1 py-0.5 capitalize">
                       {hotkeyLabel.join(" + ")}
                     </kbd>{" "}
-                    to send a request
+                    {t(lang, "playground.hotkeySuffix", "to send a request")}
                   </span>
                 </div>
               }

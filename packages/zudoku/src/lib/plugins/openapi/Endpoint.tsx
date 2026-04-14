@@ -2,7 +2,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useState, useTransition } from "react";
 import { InlineCode } from "../../components/InlineCode.js";
+import { useZudoku } from "../../hooks/index.js";
 import { Button } from "../../ui/Button.js";
+import { t } from "../../util/i18n.js";
 import { useCreateQuery } from "./client/useCreateQuery.js";
 import { useOasConfig } from "./context.js";
 import { graphql } from "./graphql/index.js";
@@ -49,6 +51,10 @@ export const Endpoint = () => {
   const query = useCreateQuery(ServersQuery, { input, type });
   const result = useSuspenseQuery(query);
   const [, startTransition] = useTransition();
+
+  const { options: globalOptions } = useZudoku();
+  const lang = globalOptions.site?.lang;
+
   const { selectedServer, setSelectedServer } = useSelectedServer(
     result.data.schema.servers,
   );
@@ -60,10 +66,12 @@ export const Endpoint = () => {
 
   return (
     <div className="flex items-center gap-1.5 flex-nowrap">
-      <span className="font-medium text-sm">Endpoint</span>
+      <span className="font-medium text-sm">
+        {t(lang, "openApi.endpoint", "Endpoint")}
+      </span>
       {servers.length > 1 ? (
         <SimpleSelect
-          className="font-mono text-xs border-input bg-transparent dark:bg-input/30 dark:hover:bg-input/50 py-1.5 max-w-[450px] truncate"
+          className="font-mono text-xs border-input bg-transparent dark:bg-input/30 dark:hover:bg-input/50 py-1.5 max-w-112.5 truncate"
           onChange={(e) =>
             startTransition(() => setSelectedServer(e.target.value))
           }

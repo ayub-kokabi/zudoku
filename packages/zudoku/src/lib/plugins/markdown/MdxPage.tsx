@@ -30,6 +30,7 @@ import {
 } from "../../components/navigation/utils.js";
 import { Pagination } from "../../components/Pagination.js";
 import { Typography } from "../../components/Typography.js";
+import { getDirection, t } from "../../util/i18n.js";
 import { joinUrl } from "../../util/joinUrl.js";
 import type { MdxComponentsType } from "../../util/MdxComponents.js";
 import { slugify } from "../../util/slugify.js";
@@ -75,6 +76,15 @@ export const MdxPage = ({
   const location = useLocation();
   const { options } = useZudoku();
   const [isCopied, setIsCopied] = useState(false);
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
+
+  const localeMap: Record<string, string> = {
+    fa: "fa-IR",
+    en: "en-US",
+  };
+
+  const currentLocale = (lang && localeMap[lang]) || lang || "en-US";
 
   const title = frontmatter.title;
   const description = frontmatter.description ?? excerpt;
@@ -175,9 +185,9 @@ export const MdxPage = ({
                   ) : (
                     <CopyIcon size={14} aria-hidden="true" />
                   )}
-                  <span>Copy page</span>
+                  <span>{t(lang, "markdown.copyPage", "Copy page")}</span>
                 </Button>
-                <DropdownMenu>
+                <DropdownMenu dir={dir}>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
@@ -195,7 +205,7 @@ export const MdxPage = ({
                       }
                     >
                       <Link2Icon className="size-4" aria-hidden="true" />
-                      Copy link to page
+                      {t(lang, "markdown.copyLinkToPage", "Copy link to page")}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="gap-2" asChild>
                       <a
@@ -207,7 +217,11 @@ export const MdxPage = ({
                           className="size-4"
                           aria-hidden="true"
                         />
-                        Open Markdown page
+                        {t(
+                          lang,
+                          "markdown.openMarkDownInNewTab",
+                          "Open markdown page",
+                        )}
                       </a>
                     </DropdownMenuItem>
                     <AiAssistantMenuItems
@@ -260,15 +274,17 @@ export const MdxPage = ({
               <div>
                 {showLastModified && lastModifiedDate && (
                   <div
-                    title={lastModifiedDate.toLocaleString(undefined, {
+                    title={lastModifiedDate.toLocaleString(currentLocale, {
                       dateStyle: "full",
                       timeStyle: "medium",
                     })}
                   >
-                    Last modified on{" "}
+                    {t(lang, "markdown.lastModified", "Last modified on")}{" "}
                     <time dateTime={lastModifiedDate.toISOString()}>
-                      {lastModifiedDate.toLocaleDateString("en-US", {
-                        dateStyle: "long",
+                      {lastModifiedDate.toLocaleDateString(currentLocale, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
                       })}
                     </time>
                   </div>

@@ -556,7 +556,7 @@ const SiteSchema = z
   .object({
     title: z.string(),
     logoUrl: z.string(),
-    dir: z.enum(["ltr", "rtl"]).optional(),
+    lang: z.string().optional(),
     logo: LogoSchema,
     showPoweredBy: z.boolean().optional(),
     banner: z.object({

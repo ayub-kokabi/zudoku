@@ -1,13 +1,16 @@
+import { getDirection } from "../lib/util/i18n.js";
+
 export function getDevHtml({
   jsEntry,
-  dir,
+  lang,
 }: {
   jsEntry: string;
-  dir?: "ltr" | "rtl";
+  lang?: string;
 }) {
+  const dir = getDirection(lang);
   return `
 <!doctype html>
-<html lang="en" ${dir ? `dir="${dir}"` : ""}>
+<html lang="${lang || "en"}" dir="${dir}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
@@ -25,19 +28,19 @@ export function getDevHtml({
 export function getBuildHtml({
   jsEntry,
   cssEntries,
-  dir,
+  lang,
 }: {
   jsEntry: string;
   cssEntries: string[];
-  dir?: "ltr" | "rtl";
+  lang?: string;
 }) {
+  const dir = getDirection(lang);
   const cssLinks = cssEntries
     .map((css) => `    <link rel="stylesheet" crossorigin href="${css}">`)
     .join("\n");
-
   return `
 <!doctype html>
-<html lang="en" ${dir ? `dir="${dir}"` : ""}>
+<html lang="${lang || "en"}" dir="${dir}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">

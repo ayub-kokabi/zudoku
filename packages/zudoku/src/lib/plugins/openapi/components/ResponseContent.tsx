@@ -1,9 +1,11 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useState } from "react";
+import { useZudoku } from "zudoku/components";
 import { Badge } from "zudoku/ui/Badge.js";
 import { NativeSelect, NativeSelectOption } from "zudoku/ui/NativeSelect.js";
 import { cn } from "zudoku/ui/util.js";
 import { Markdown } from "../../../components/Markdown.js";
+import { getDirection } from "../../../util/i18n.js";
 import type { MediaTypeObject } from "../graphql/graphql.js";
 import { SchemaView } from "../schema/SchemaView.js";
 
@@ -30,6 +32,10 @@ export const ResponseContent = ({
 
   const hideTabs =
     responses.length === 1 && responses.at(0)?.statusCode === "200";
+
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
 
   const cardHeader = (
     <div className="flex flex-col text-muted-foreground">
@@ -70,7 +76,7 @@ export const ResponseContent = ({
           </NativeSelect>
         )}
       </div>
-      <div className="p-2 clear-both">
+      <div className="p-2 clear-both" dir={dir}>
         {hideTabs && (
           <Badge variant="outline" className="float-start me-2">
             {currentResponse?.statusCode}

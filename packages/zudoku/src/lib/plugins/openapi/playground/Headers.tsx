@@ -1,10 +1,12 @@
 import { CircleAlertIcon, LockIcon, TableOfContentsIcon } from "lucide-react";
 import { type Control, useFormContext } from "react-hook-form";
+import { useZudoku } from "zudoku/components";
 import { Checkbox } from "zudoku/ui/Checkbox.js";
 import { Collapsible, CollapsibleContent } from "zudoku/ui/Collapsible.js";
 import { Tooltip, TooltipContent, TooltipTrigger } from "zudoku/ui/Tooltip.js";
 import { Autocomplete } from "../../../components/Autocomplete.js";
 import { cn } from "../../../util/cn.js";
+import { getDirection, t } from "../../../util/i18n.js";
 import {
   CollapsibleHeader,
   CollapsibleHeaderTrigger,
@@ -65,13 +67,19 @@ export const Headers = ({
       locked: true,
     })) ?? [];
 
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
+
   return (
-    <Collapsible defaultOpen>
+    <Collapsible dir={dir} defaultOpen>
       <CollapsibleHeaderTrigger>
         <TableOfContentsIcon size={14} aria-hidden="true" />
-        <CollapsibleHeader>Headers</CollapsibleHeader>
+        <CollapsibleHeader>
+          {t(lang, "openApi.parameters.header", "Headers")}
+        </CollapsibleHeader>
       </CollapsibleHeaderTrigger>
-      <CollapsibleContent className="CollapsibleContent">
+      <CollapsibleContent className="CollapsibleContent" dir="ltr">
         <div className="flex flex-col gap-2">
           <div className="overflow-hidden">
             <ParamsGrid>

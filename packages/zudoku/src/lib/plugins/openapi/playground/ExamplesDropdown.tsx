@@ -1,4 +1,5 @@
 import { PlusCircleIcon } from "lucide-react";
+import { useZudoku } from "zudoku/components";
 import { Button } from "zudoku/ui/Button.js";
 import {
   DropdownMenu,
@@ -9,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "zudoku/ui/DropdownMenu.js";
+import { t } from "../../../util/i18n.js";
 import type { ExampleItem, MediaTypeObject } from "../graphql/graphql.js";
 
 const ExamplesDropdown = ({
@@ -18,6 +20,9 @@ const ExamplesDropdown = ({
   examples: MediaTypeObject[];
   onSelect: (example: ExampleItem, mediaType: string) => void;
 }) => {
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,7 +31,7 @@ const ExamplesDropdown = ({
           size="sm"
           className="hover:bg-accent hover:brightness-95 gap-2"
         >
-          Use Example
+          {t(lang, "playground.BodyPanel.example.useExample", "Use Example")}
           <PlusCircleIcon size={14} />
         </Button>
       </DropdownMenuTrigger>

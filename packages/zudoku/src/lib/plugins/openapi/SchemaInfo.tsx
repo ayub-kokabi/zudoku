@@ -13,6 +13,7 @@ import { Link } from "react-router";
 import { Separator } from "zudoku/ui/Separator.js";
 import { Markdown } from "../../components/Markdown.js";
 import { PagefindSearchMeta } from "../../components/PagefindSearchMeta.js";
+import { useZudoku } from "../../hooks/index.js";
 import { Badge } from "../../ui/Badge.js";
 import { Button } from "../../ui/Button.js";
 import { Card, CardContent } from "../../ui/Card.js";
@@ -24,6 +25,7 @@ import {
   ItemTitle,
 } from "../../ui/Item.js";
 import { Popover, PopoverContent, PopoverTrigger } from "../../ui/Popover.js";
+import { t } from "../../util/i18n.js";
 import { slugify } from "../../util/slugify.js";
 import { ApiHeader } from "./ApiHeader.js";
 import { useCreateQuery } from "./client/useCreateQuery.js";
@@ -96,8 +98,10 @@ const InfoLink = ({
 
 const InfoCardContent = ({
   schema,
+  lang,
 }: {
   schema: SchemaInfoQueryType["schema"];
+  lang?: string;
 }) => {
   const hasInfoLinks = !!(
     schema.license ||
@@ -110,9 +114,10 @@ const InfoCardContent = ({
     schema.contact?.url
   );
   const hasServers = schema.servers.length > 0;
+  const dir = lang === "fa" ? "rtl" : "ltr";
 
   return (
-    <CardContent className="flex flex-col gap-3 text-sm">
+    <CardContent className="flex flex-col gap-3 text-sm" dir="ltr">
       {hasInfoLinks && (
         <div className="flex flex-col gap-1.5">
           {schema.license && (
@@ -133,8 +138,11 @@ const InfoCardContent = ({
       {hasInfoLinks && (hasContact || hasServers) && <Separator />}
       {hasContact && (
         <div className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-            Contact
+          <span
+            className="text-xs text-muted-foreground font-medium uppercase tracking-wide"
+            dir={dir}
+          >
+            {t(lang, "schemaInfo.contact", "Contact")}
           </span>
           {schema.contact?.name && <span>{schema.contact.name}</span>}
           {schema.contact?.email && (
@@ -155,8 +163,11 @@ const InfoCardContent = ({
       {hasContact && hasServers && <Separator />}
       {hasServers && (
         <div className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-            Servers
+          <span
+            className="text-xs text-muted-foreground font-medium uppercase tracking-wide"
+            dir={dir}
+          >
+            {t(lang, "schemaInfo.servers", "Servers")}
           </span>
           {schema.servers.map((server) => (
             <div key={server.url}>
@@ -175,6 +186,9 @@ const InfoCardContent = ({
 };
 
 export const SchemaInfo = () => {
+  const { options: globalOptions } = useZudoku();
+  const lang = globalOptions.site?.lang;
+
   const { input, type } = useOasConfig();
   const query = useCreateQuery(SchemaInfoQuery, { input, type });
   const {
@@ -230,7 +244,7 @@ export const SchemaInfo = () => {
                   align="end"
                   className="xl:hidden w-full max-w-full md:max-w-sm"
                 >
-                  <InfoCardContent schema={schema} />
+                  <InfoCardContent schema={schema} lang={lang} />
                 </PopoverContent>
               </Popover>
             </div>
@@ -249,7 +263,7 @@ export const SchemaInfo = () => {
               <div>
                 <div className="flex items-center gap-2 text-sm uppercase tracking-wide text-muted-foreground mb-4">
                   <TagIcon size={14} />
-                  Tags
+                  {t(lang, "schemaInfo.tags", "Tags")}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {tags.map((tag) => (
@@ -281,7 +295,7 @@ export const SchemaInfo = () => {
               <div>
                 <div className="flex items-center gap-2 text-sm uppercase tracking-wide text-muted-foreground mb-4">
                   <BracesIcon size={14} />
-                  Schemas
+                  {t(lang, "schemaInfo.schemas", "Schemas")}
                 </div>
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
                   {schema.components?.schemas?.map((s) => (
@@ -300,7 +314,7 @@ export const SchemaInfo = () => {
               <div>
                 <div className="flex items-center gap-2 text-sm uppercase tracking-wide text-muted-foreground mb-4">
                   <WebhookIcon size={14} />
-                  Webhooks
+                  {t(lang, "schemaInfo.webhooks", "Webhooks")}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {schema.webhooks.map((webhook) => (
@@ -333,7 +347,7 @@ export const SchemaInfo = () => {
           {hasCardContent && (
             <div className="hidden xl:block">
               <Card className="sticky top-(--scroll-padding)">
-                <InfoCardContent schema={schema} />
+                <InfoCardContent schema={schema} lang={lang} />
               </Card>
             </div>
           )}

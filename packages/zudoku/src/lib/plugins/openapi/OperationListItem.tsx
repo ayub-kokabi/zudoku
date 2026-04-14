@@ -4,7 +4,9 @@ import { Separator } from "zudoku/ui/Separator.js";
 import { Heading } from "../../components/Heading.js";
 import { Markdown } from "../../components/Markdown.js";
 import { PagefindSearchMeta } from "../../components/PagefindSearchMeta.js";
+import { useZudoku } from "../../hooks/index.js";
 import { cn } from "../../util/cn.js";
+import { getDirection, t } from "../../util/i18n.js";
 import { renderIf } from "../../util/renderIf.js";
 import { ResponseContent } from "./components/ResponseContent.js";
 import { SelectOnClick } from "./components/SelectOnClick.js";
@@ -44,6 +46,10 @@ export const OperationListItem = ({
   const [selectedResponse, setSelectedResponse] = useState(first?.statusCode);
   const isMCPEndpoint = operation.extensions?.["x-mcp-server"] !== undefined;
 
+  const { options: zudokuOptions } = useZudoku();
+  const lang = zudokuOptions.site?.lang;
+  const dir = getDirection(lang);
+
   return (
     <div>
       {operation.deprecated && (
@@ -67,7 +73,12 @@ export const OperationListItem = ({
           {operation.summary}
         </Heading>
         {!isMCPEndpoint && (
-          <div className="text-sm flex gap-2 font-mono col-span-full">
+          <div
+            className={`text-sm flex gap-2 font-mono col-span-full ${
+              dir === "rtl" ? "justify-end" : ""
+            }`}
+            dir="ltr"
+          >
             <span className={methodForColor(operation.method)}>
               {operation.method.toUpperCase()}
             </span>
@@ -95,6 +106,7 @@ export const OperationListItem = ({
           </div>
         ) : (
           <div
+            dir={dir}
             className={cn(
               "flex flex-col gap-4",
               options?.disableSidecar && "col-span-full",
@@ -110,13 +122,15 @@ export const OperationListItem = ({
               operation.parameters.length > 0 &&
               PARAM_GROUPS.flatMap((group) =>
                 groupedParameters[group]?.length ? (
-                  <ParameterList
-                    key={group}
-                    summary={operation.summary ?? undefined}
-                    id={operation.slug}
-                    parameters={groupedParameters[group]}
-                    group={group}
-                  />
+                  <div dir="ltr" key={group}>
+                    <ParameterList
+                      key={group}
+                      summary={operation.summary ?? undefined}
+                      id={operation.slug}
+                      parameters={groupedParameters[group]}
+                      group={group}
+                    />
+                  </div>
                 ) : (
                   []
                 ),
@@ -127,18 +141,19 @@ export const OperationListItem = ({
             {renderIf(
               operation.requestBody?.content?.at(0)?.schema,
               (schema) => (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4" dir="ltr">
                   <Heading
                     level={3}
                     className="capitalize flex items-center gap-2"
                     id={`${operation.slug}/request-body`}
+                    dir={dir}
                   >
                     {operation.summary && (
                       <PagefindSearchMeta>
                         {operation.summary} &rsaquo;{" "}
                       </PagefindSearchMeta>
                     )}
-                    Request Body{" "}
+                    {t(lang, "operation.requestBody", "Request Body")}
                     {operation.requestBody?.required === false ? (
                       <Badge variant="muted">optional</Badge>
                     ) : (
@@ -151,21 +166,21 @@ export const OperationListItem = ({
             )}
             <Separator className="my-4" />
             {operation.responses.length > 0 && (
-              <>
-                <Heading level={3} id={`${operation.slug}/responses`}>
+              <div className="flex flex-col gap-4" dir="rtl">
+                <Heading level={3} id={`${operation.slug}/responses`} dir={dir}>
                   {operation.summary && (
                     <PagefindSearchMeta>
                       {operation.summary} &rsaquo;{" "}
                     </PagefindSearchMeta>
                   )}
-                  Responses
+                  {t(lang, "operation.responses", "Responses")}
                 </Heading>
                 <ResponseContent
                   responses={operation.responses}
                   selectedResponse={selectedResponse}
                   onSelectResponse={setSelectedResponse}
                 />
-              </>
+              </div>
             )}
           </div>
         )}

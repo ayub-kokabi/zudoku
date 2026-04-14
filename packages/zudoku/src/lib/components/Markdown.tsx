@@ -20,7 +20,9 @@ export const Markdown = memo(
     className?: string;
     components?: Components;
   }) => {
-    const { syntaxHighlighting } = useZudoku().options;
+    const { options } = useZudoku();
+    const dir = options.site?.dir;
+    const { syntaxHighlighting } = options;
     const highlighter = useHighlighter();
     const rehypePlugins = useMemo(
       () => [
@@ -39,7 +41,7 @@ export const Markdown = memo(
     );
 
     return (
-      <Typography className={className}>
+      <Typography className={className} dir={dir}>
         <ReactMarkdown
           remarkPlugins={remarkPlugins}
           rehypePlugins={rehypePlugins}

@@ -12,7 +12,7 @@
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   "[javascript]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
@@ -36,7 +36,8 @@
     "nx.json": "jsonc",
     "project.json": "jsonc",
     "biome.jsonc": "jsonc",
-    "*.mdx": "markdown"
+    "*.mdx": "markdown",
+    "*.css": "tailwindcss"
   },
   "tailwindCSS.experimental.configFile": "packages/zudoku/src/app/main.css"
 }

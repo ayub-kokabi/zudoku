@@ -1,7 +1,9 @@
 import { ExternalLinkIcon } from "lucide-react";
 import { Badge } from "zudoku/ui/Badge.js";
 import { NativeSelect, NativeSelectOption } from "zudoku/ui/NativeSelect.js";
+import { useZudoku } from "../../hooks/index.js";
 import { SyntaxHighlight } from "../../ui/SyntaxHighlight.js";
+import { getDirection } from "../../util/i18n.js";
 import { NonHighlightedCode } from "./components/NonHighlightedCode.js";
 import type { MediaTypeObject } from "./graphql/graphql.js";
 import * as SidecarBox from "./SidecarBox.js";
@@ -56,7 +58,12 @@ export const SidecarExamples = ({
   isOnScreen,
   shouldLazyHighlight,
 }: SidecarExamplesProps) => {
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
+  const dir = getDirection(lang);
+
   // Get example value, with fallback to schema-generated example
+
   const selectedContent = content[selectedContentIndex];
   const examples = selectedContent?.examples ?? [];
   const selectedExample = examples?.[selectedExampleIndex];
@@ -73,7 +80,7 @@ export const SidecarExamples = ({
               href={selectedExample.externalValue}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-primary hover:underline"
+              className="text-sm text-primary hover:underline"
             >
               View External Example
               <ExternalLinkIcon className="size-3 inline-block ms-1 align-[-0.125em]" />
@@ -85,7 +92,7 @@ export const SidecarExamples = ({
           <SyntaxHighlight
             embedded
             language={language}
-            className="[--scrollbar-color:gray] rounded-none max-h-[200px] text-xs overflow-auto"
+            className="[--scrollbar-color:gray] rounded-none max-h-50 text-sm overflow-auto"
             code={formattedExample}
           />
         ) : (
@@ -138,33 +145,35 @@ export const SidecarExamples = ({
               )}
             </div>
             {examples.length > 1 && (
-              <NativeSelect
-                className="text-xs h-fit py-1 truncate bg-background"
-                value={selectedExampleIndex.toString()}
-                onChange={(e) =>
-                  onExampleChange?.({
-                    contentTypeIndex: selectedContentIndex,
-                    exampleIndex: Number(e.target.value),
-                  })
-                }
-              >
-                {examples.map((example, index) => (
-                  <NativeSelectOption
-                    key={
-                      example.summary ||
-                      example.name ||
-                      example.description ||
-                      `Example ${index + 1}`
-                    }
-                    value={index.toString()}
-                  >
-                    {example.summary ||
-                      example.name ||
-                      example.description ||
-                      `Example ${index + 1}`}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
+              <div dir={dir}>
+                <NativeSelect
+                  className="text-xs h-fit py-1 truncate bg-background"
+                  value={selectedExampleIndex.toString()}
+                  onChange={(e) =>
+                    onExampleChange?.({
+                      contentTypeIndex: selectedContentIndex,
+                      exampleIndex: Number(e.target.value),
+                    })
+                  }
+                >
+                  {examples.map((example, index) => (
+                    <NativeSelectOption
+                      key={
+                        example.summary ||
+                        example.name ||
+                        example.description ||
+                        `Example ${index + 1}`
+                      }
+                      value={index.toString()}
+                    >
+                      {example.summary ||
+                        example.name ||
+                        example.description ||
+                        `Example ${index + 1}`}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </div>
             )}
           </div>
         )}

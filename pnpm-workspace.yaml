@@ -35,7 +35,16 @@ minimumReleaseAgeExclude:
   - lucide-react
 
 onlyBuiltDependencies:
+  - "@clerk/shared"
+  - "@firebase/util"
+  - browser-tabs-lock
+  - bufferutil
+  - core-js
   - esbuild
+  - lefthook
+  - nx
+  - protobufjs
+  - utf-8-validate
 
 overrides:
   bs58: ">=6"

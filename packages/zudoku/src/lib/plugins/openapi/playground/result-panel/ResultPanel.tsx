@@ -1,9 +1,10 @@
 import type { UseMutationResult } from "@tanstack/react-query";
 import { SendIcon, UnplugIcon } from "lucide-react";
-import { Spinner } from "zudoku/components";
+import { Spinner, useZudoku } from "zudoku/components";
 import { Alert, AlertDescription, AlertTitle } from "zudoku/ui/Alert.js";
 import { Button } from "../../../../ui/Button.js";
 import { cn } from "../../../../util/cn.js";
+import { t } from "../../../../util/i18n.js";
 import type { PlaygroundResult } from "../Playground.js";
 import ResponseStatusBar from "./ResponseStatusBar.js";
 import { ResponseTab } from "./ResponseTab.js";
@@ -24,6 +25,8 @@ export const ResultPanel = ({
   progress: number;
   tip?: React.ReactNode;
 }) => {
+  const { options } = useZudoku();
+  const lang = options.site?.lang;
   return (
     <div className="flex flex-col overflow-y-auto h-[80vh] bg-muted/50">
       {(queryMutation.isPending || queryMutation.data) && (
@@ -72,7 +75,11 @@ export const ResultPanel = ({
                 showLongRunningWarning && "opacity-100 pointer-events-auto",
               )}
             >
-              Looks like the request is taking longer than expected.
+              {t(
+                lang,
+                "playground.resultPanel.longRunning",
+                "Looks like the request is taking longer than expected.",
+              )}
               <Button
                 type="button"
                 onClick={onCancel}
@@ -80,7 +87,7 @@ export const ResultPanel = ({
                 className="w-fit"
                 variant="outline"
               >
-                Cancel
+                {t(lang, "playground.cancel", "Cancel")}
               </Button>
             </div>
           </div>
@@ -95,7 +102,11 @@ export const ResultPanel = ({
               aria-hidden="true"
             />
             <span className="text-[16px] font-semibold text-muted-foreground">
-              Send your first request
+              {t(
+                lang,
+                "playground.resultPanel.send",
+                "Send your first request",
+              )}
             </span>
             {tip}
           </div>

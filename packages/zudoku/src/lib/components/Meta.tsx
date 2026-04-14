@@ -1,17 +1,27 @@
 import { Helmet } from "@zudoku/react-helmet-async";
-import type { PropsWithChildren } from "react";
+import { useLayoutEffect, type PropsWithChildren } from "react";
 import { useLocation } from "react-router";
+import { getDirection } from "../util/i18n.js";
 import { joinUrl } from "../util/joinUrl.js";
 import { useZudoku } from "./context/ZudokuContext.js";
 
 export const Meta = ({ children }: PropsWithChildren) => {
   const { options } = useZudoku();
-  const { metadata: meta } = options;
+  const { metadata: meta, site } = options;
   const location = useLocation();
+  const dir = getDirection(site?.lang);
+
+  useLayoutEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.dir = dir;
+      document.documentElement.lang = site?.lang ?? "en";
+    }
+  }, [dir, site?.lang]);
 
   return (
     <>
       <Helmet titleTemplate={meta?.title} defaultTitle={meta?.defaultTitle}>
+        <html lang={site?.lang ?? "en"} dir={dir} />
         {options.canonicalUrlOrigin && (
           <link
             rel="canonical"

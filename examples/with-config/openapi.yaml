@@ -1,0 +1,372 @@
+openapi: 3.1.0
+info:
+  title: مستندات فهم
+  version: 1.0.0
+  description: >
+    مستندات جامع API پروژه فهم.
+    این API مجموعه گستردهای از خدمات هوشمند شامل چت LLM، جستجوی معنایی،
+    هوش سندی، تصحیح ASR، تبدیل متن به گفتار، کمک هوشمند پایگاه داده،
+    و ادغام های گسترده iframe/auth شخص ثالث (Barid، Iranrayaneh، Keycloak/OIDC) را فراهم می‌کند.
+  contact:
+    name: Roshan AI
+    url: https://roshan-ai.ir
+
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+  termsOfService: https://roshan-ai.ir/terms-of-service
+
+externalDocs:
+  description: مستندات کامل و راهنمای توسعه‌دهندگان فهم
+  url: https://docs.roshan-ai.ir/fahm-api
+
+servers:
+  - url: https://fahm.roshan-ai.ir
+    description: Fahm
+
+security:
+  - BearerAuth: []
+
+paths:
+  # ==========================================
+  # احراز هویت
+  # ===========================================
+
+  /auth/glogin/:
+    post:
+      summary: ورود به فهم
+      description: >
+        احراز هویت کاربر با اعتبارات نام کاربری و رمز عبور.
+        پس از احراز هویت موفق مجموعهای از توکن های JWT (access، refresh، id) را برمی‌گرداند.
+
+        **توجه:** هدر `Content-Type: application/json` اجباری است.
+        بدون آن، سرور خطای 415 را برمی‌گرداند.
+      tags:
+        - احراز هویت
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            example:
+              username: "evaluate"
+              password: "********"
+      responses:
+        "200":
+          description: احراز هویت موفق.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+              example:
+                access_token: "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIi..."
+                expires_in: 30758400
+                refresh_expires_in: 31536000
+                refresh_token: "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIi..."
+                token_type: "Bearer"
+                id_token: "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIi..."
+                not-before-policy: 1766836255
+                session_state: "7985d564-70f9-4b12-9276-92ea9c1da58a"
+                scope: "openid groups-scope profile email"
+
+        "400":
+          description: درخواست نامعتبر.
+          content:
+            application/json:
+              examples:
+                A field is missing:
+                  summary: یک فیلد گم شده است
+                  value:
+                    username: ["این فیلد الزامی است."]
+                A field name is wrong:
+                  summary: نام فیلد نادرست است
+                  value:
+                    username: ["این فیلد الزامی است."]
+                A field is blank:
+                  summary: یک فیلد خالی است
+                  value:
+                    username: ["این فیلد نمی‌تواند خالی باشد."]
+                Request body is empty:
+                  summary: بدنه درخواست خالی است
+                  value:
+                    {
+                      "username": ["این فیلد الزامی است."],
+                      "password": ["این فیلد الزامی است."],
+                    }
+                JSON syntax is invalid:
+                  summary: نحو JSON نامعتبر است
+                  value:
+                    detail: "خطای تجزیه JSON - داده اضافی: خط 2 ستون 13 (کاراکتر 13)"
+
+        "401":
+          description: نام کاربری یا رمز عبور نامعتبر است.
+          content:
+            application/json:
+              example:
+                error: "اعتبارات نامعتبر."
+
+        "415":
+          description: هدر Content-Type گم شده است.
+          content:
+            application/json:
+              example:
+                detail: 'نوع رسانه پشتیبانی نشده "" در درخواست.'
+
+        "503":
+          description: سرویس در دسترس نیست. سرویس احراز هویت خراب است.
+          content:
+            application/json:
+              example:
+                error: "سرویس احراز هویت در دسترس نیست."
+
+  # ==========================================
+  # چت و دستیاران هوشمند
+  # ==========================================
+  /api/chat/list/:
+    get:
+      summary: لیست چت‌های کاربر
+      description: فهرستی صفحه‌بندی شده از جلسات چت فعال را بازیابی می‌کند.
+      tags:
+        - هسته چت
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PageSizeParam"
+      responses:
+        "200":
+          description: فهرستی صفحه‌بندی شده از جلسات چت.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedChatList"
+              examples:
+                first_page:
+                  summary: صفحه اول جلسات چت
+                  value:
+                    count: 50280
+                    next: "http://fahm.roshan-ai.ir/api/chat/list/?page=2&page_size=2"
+                    previous: null
+                    services:
+                      - id: 137603
+                        name: "سلام"
+                        type: 12
+                        created_at: "2026-04-08T10:40:17.688363"
+                        updated_at: "2026-04-08T10:40:17.688379"
+                      - id: 137596
+                        name: "یک سوال داشتم"
+                        type: 12
+                        created_at: "2026-04-07T13:58:41.113369"
+                        updated_at: "2026-04-07T13:58:41.113382"
+                middle_page:
+                  summary: صفحه میانی جلسات چت
+                  value:
+                    count: 50280
+                    next: "http://fahm.roshan-ai.ir/api/chat/list/?page=3&page_size=2"
+                    previous: "http://fahm.roshan-ai.ir/api/chat/list/?page_size=2"
+                    services:
+                      - id: 137589
+                        name: "در پاییز سال ۹۹ شرکت ..."
+                        type: 12
+                        created_at: "2026-04-07T02:08:10.284997"
+                        updated_at: "2026-04-07T02:08:10.285011"
+                      - id: 137588
+                        name: "چه تصمیماتی در مورد ادغام شرکت‌ها ..."
+                        type: 12
+                        created_at: "2026-04-07T02:07:50.699539"
+                        updated_at: "2026-04-07T02:07:50.699556"
+                last_page:
+                  summary: صفحه آخر جلسات چت
+                  value:
+                    count: 50280
+                    next: null
+                    previous: "http://fahm.roshan-ai.ir/api/chat/list/?page=25139&page_size=2"
+                    services:
+                      - id: 13028
+                        name: "لیست درصد تحقق هدف میانگین دی ماه برای گروه ممتاز..."
+                        type: 12
+                        created_at: "2025-11-01T10:26:38.804035"
+                        updated_at: "2025-11-01T10:26:38.804090"
+                      - id: 13027
+                        name: "با توجه به توافقات صورت گرفته با شرکت ..."
+                        type: 12
+                        created_at: "2025-11-01T10:26:07.691499"
+                        updated_at: "2025-11-01T10:26:07.691515"
+
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: |
+            ممنوع. این خطا معمولاً مشکل احراز هویت را نشان می‌دهد.
+
+            **توجه در خصوص خطاهای متقطع:**
+            گاهی اوقات، ممکن است ارسال یک `403` با جزئیات `"سرویس احراز هویت در دسترس نیست"` به دلیل مسائل اتصال سرویس داخلی موقت دریافت کنید.
+            این یک خطای موقت است. اگر این پیام خاص را دریافت کردید، لطفاً **درخواست را دوباره تلاش کنید** پس از کمی تاخیر.
+          content:
+            application/json:
+              examples:
+                AuthServiceUnavailable:
+                  summary: "قطع موقت سرویس احراز هویت"
+                  value:
+                    detail: "سرویس احراز هویت در دسترس نیست."
+        "404":
+          description: هیچ چتی یافت نشد.
+          content:
+            application/json:
+              examples:
+                exceed_total_pages:
+                  summary: شماره صفحه از کل صفحات بیشتر است
+                  value:
+                    detail: "صفحه نامعتبر است."
+                page number is less than 1:
+                  summary: شماره صفحه کمتر از 1 است
+                  value:
+                    detail: "صفحه نامعتبر است."
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: توکن Bearer JWT استاندارد که از Keycloak/SSO به دست می‌آید.
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: شماره صفحه صفحه‌بندی.
+      schema:
+        type: integer
+        default: 1
+    PageSizeParam:
+      name: page_size
+      in: query
+      description: تعداد موارد در هر صفحه. اگر از 100 بیشتر باشد، بدون بالا بردن خطا در 100 محدود می‌شود.
+      schema:
+        type: integer
+        default: 10
+        maximum: 100
+    LlmModelParam:
+      name: llm_model
+      in: query
+      description: لغو اختیاری برای slug مدل LLM برای این درخواست خاص.
+      schema:
+        type: string
+    ChatIdPathParam:
+      name: chat_id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  responses:
+    UnauthorizedError:
+      description: اعتبارات احراز هویت فراهم نشده یا توکن نامعتبر است.
+      content:
+        application/json:
+          example:
+            detail: "اعتبارات احراز هویت فراهم نشده‌اند."
+    FeatureForbiddenError:
+      description: نمایه کاربر دارای مجوز لازم (ID ویژگی) برای این سرویس نیست.
+      content:
+        application/json:
+          example:
+            detail: "شما دارای ویژگی لازم نیستید."
+    InternalServerError:
+      description: یک خطای داخلی پیش‌بینی نشده رخ داده است.
+      content:
+        application/json:
+          example:
+            error: "استثنا در نما: ... "
+
+  schemas:
+    PaginatedChatList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: تعداد کل چت‌های در دسترس.
+        next:
+          type: string
+          format: uri
+          nullable: true
+          description: URL صفحه بعدی نتایج، اگر وجود داشته باشد.
+        previous:
+          type: string
+          format: uri
+          nullable: true
+          description: URL صفحه قبلی نتایج، اگر وجود داشته باشد.
+        services:
+          type: array
+          description: فهرستی از جلسات چت برای صفحه فعلی.
+          items:
+            $ref: "#/components/schemas/ChatListResponse"
+
+    ChatListResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: شناسه منحصر به فرد چت.
+        name:
+          type: string
+          description: عنوان چت (خودکار از پیام اول تولید می‌شود).
+        type:
+          type: integer
+          description: کد عددی نوع سرویس (مثلاً 12=چت عمومی).
+        created_at:
+          type: string
+          format: date-time
+          description: مهر زمانی زمانی که چت ایجاد شد.
+        updated_at:
+          type: string
+          format: date-time
+          description: مهر زمانی آخرین به‌روزرسانی چت.
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          description: نام کاربری حساب فهم.
+          example: "evaluate"
+        password:
+          type: string
+          format: password
+          description: رمز عبور حساب فهم.
+          example: "********"
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: توکن دسترسی JWT (Bearer).
+        expires_in:
+          type: integer
+          description: مدت زمان عمر توکن دسترسی در ثانیه.
+        refresh_expires_in:
+          type: integer
+          description: مدت زمان عمر توکن تازه‌کننده در ثانیه.
+        refresh_token:
+          type: string
+          description: توکن تازه‌کننده JWT.
+        token_type:
+          type: string
+          enum: [Bearer]
+        id_token:
+          type: string
+          description: توکن شناسه OIDC حاوی ادعاهای کاربر.
+        not-before-policy:
+          type: integer
+          description: مهر زمانی Unix که نشان دهنده شروع اعتبار توکن است.
+        session_state:
+          type: string
+          format: uuid
+          description: شناسه جلسه.
+        scope:
+          type: string
+          description: شناسه های اعطا شده.
