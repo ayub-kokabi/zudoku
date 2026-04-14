@@ -62,7 +62,7 @@ export const QueryParams = ({
           {t(lang, "openApi.parameters.query", "Query Parameters")}
         </CollapsibleHeader>
       </CollapsibleHeaderTrigger>
-      <CollapsibleContent className="CollapsibleContent" dir={dir}>
+      <CollapsibleContent className="CollapsibleContent" dir={"ltr"}>
         <ParamsGrid>
           {manager.fields.map((field, i) => {
             const currentParam = schemaQueryParams.find(
